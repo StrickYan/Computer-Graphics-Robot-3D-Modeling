@@ -1,0 +1,22 @@
+ModelerSkeleton-11.2-sp01 RELEASE NOTES
+
+Eugene Hsu / ehsu@cs / 04-18-01
+
+CHANGES from 11-sp01
+--------------------
+
+Modelerapp.cpp:
+
+   Forgot to remove the m_modelerView from the Fl_Window.  This was
+   causing very unusual crashes.  11.1 was a temporary fix by not
+   deleting the old Fl_Gl_Window.
+
+ModelerUi.*
+
+   Added raytrace file output functionality.  By default, this outputs
+   the scene from the *default* camera view.
+
+ModelerView.*
+
+   Added destructor to properly delete m_camera.  Removed drawing of
+   camera axes.  Extended view frustum to 100 instead of 50.

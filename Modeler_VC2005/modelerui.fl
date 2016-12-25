@@ -1,0 +1,190 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.00 
+header_name {.h} 
+code_name {.cxx} 
+gridx 5 
+gridy 5 
+snap 3
+class ModelerUserInterface {open
+} {
+  Function {ModelerUserInterface()} {open
+  } {
+    Fl_Window m_controlsWindow {
+      label {CS 341 Modeler (SP02)}
+      callback {0;;} open
+      xywh {558 295 395 326} when 0 resizable visible
+    } {
+      Fl_Menu_Bar m_controlsMenuBar {open
+        xywh {0 0 395 25}
+      } {
+        submenu {} {
+          label File open
+          xywh {0 0 100 20}
+        } {
+          menuitem {} {
+            label {Save Raytracer File}
+            callback {char *filename = NULL;
+filename = fl_file_chooser("Save RAY File", "*.ray", NULL);
+if (filename)
+{
+	if (openRayFile(filename) == false)
+		fl_alert("Error opening file.");
+	else
+	{
+		m_modelerView->draw();
+		closeRayFile();
+	}
+}} selected
+            xywh {0 0 100 20}
+            code0 {\#include "modelerview.h"}
+            code1 {\#include <FL/Fl_File_Chooser.H>}
+            code2 {\#include <FL/Fl_Message.H>}
+          }
+          menuitem {} {
+            label {Save Bitmap File}
+            callback {char *filename = NULL;
+filename = fl_file_chooser("Save BMP File", "*.bmp", NULL);
+if (filename)
+{
+	int x = m_modelerView->x();
+	int y = m_modelerView->y();
+	int w = m_modelerView->w();
+	int h = m_modelerView->h();
+
+	m_modelerWindow->show();
+//	do {Sleep(10); }
+//	while (!m_modelerWindow->shown());
+//	m_modelerView->draw();
+	m_modelerView->make_current();
+m_modelerView->draw();
+	
+		
+	unsigned char *imageBuffer = new unsigned char[3*w*h];
+
+        // Tell openGL to read from the front buffer when capturing
+        // out paint strokes
+        glReadBuffer(GL_BACK);
+
+        glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+        glPixelStorei( GL_PACK_ROW_LENGTH, w );
+        
+        glReadPixels( 0, 0, w, h, 
+                GL_RGB, GL_UNSIGNED_BYTE, 
+                imageBuffer );
+
+
+	writeBMP(filename, w,h, imageBuffer);
+
+	delete [] imageBuffer;
+}}
+            xywh {10 10 100 20} divider
+            code0 {\#include "modelerview.h"}
+            code1 {\#include <FL/Fl_File_Chooser.H>}
+            code2 {\#include <FL/Fl_Message.H>}
+            code3 {\#include "bitmap.h"}
+          }
+          menuitem {} {
+            label Exit
+            callback {m_controlsWindow->hide();
+m_modelerWindow->hide();}
+            xywh {10 10 100 20}
+          }
+        }
+        submenu {} {
+          label View open
+          xywh {0 0 100 20}
+          code0 {\#include "modelerdraw.h"}
+        } {
+          menuitem {} {
+            label Normal
+            callback {setDrawMode(NORMAL);
+m_modelerView->redraw();}
+            xywh {0 0 100 20} type Radio value 1
+          }
+          menuitem {} {
+            label {Flat Shaded}
+            callback {setDrawMode(FLATSHADE);
+m_modelerView->redraw();}
+            xywh {0 0 100 20} type Radio
+          }
+          menuitem {} {
+            label Wireframe
+            callback {setDrawMode(WIREFRAME);
+m_modelerView->redraw();}
+            xywh {10 10 100 20} type Radio divider
+          }
+          menuitem {} {
+            label {High Quality}
+            callback {setQuality(HIGH);
+m_modelerView->redraw();}
+            xywh {0 0 100 20} type Radio
+          }
+          menuitem {} {
+            label {Medium Quality}
+            callback {setQuality(MEDIUM);
+m_modelerView->redraw();}
+            xywh {10 10 100 20} type Radio value 1
+          }
+          menuitem {} {
+            label {Low Quality}
+            callback {setQuality(LOW);
+m_modelerView->redraw();}
+            xywh {20 20 100 20} type Radio
+          }
+          menuitem {} {
+            label {Poor Quality}
+            callback {setQuality(POOR);
+m_modelerView->redraw();}
+            xywh {30 30 100 20} type Radio
+          }
+        }
+        submenu {} {
+          label Animate open
+          xywh {0 0 100 20}
+        } {
+          menuitem m_controlsAnimOnMenu {
+            label Enable
+            callback {ModelerApplication::Instance()->m_animating = (m_controlsAnimOnMenu->value() == 0) ? false : true;}
+            xywh {0 0 100 20} type Toggle
+          }
+        }
+      }
+      Fl_Browser m_controlsBrowser {
+        label Controls
+        callback {for (int i=0; i<ModelerApplication::Instance()->m_numControls; i++) {
+	if (m_controlsBrowser->selected(i+1))
+		ModelerApplication::Instance()->ShowControl(i);
+	else
+		ModelerApplication::Instance()->HideControl(i);
+}}
+        xywh {0 25 140 300} type Multi textsize 10 resizable
+      }
+      Fl_Scroll m_controlsScroll {open
+        xywh {145 25 250 300} type VERTICAL_ALWAYS when 1
+      } {
+        Fl_Pack m_controlsPack {open
+          xywh {145 25 225 300}
+          code0 {\#include "modelerapp.h"}
+        } {}
+      }
+    }
+    Fl_Window m_modelerWindow {
+      label Model
+      callback {0;} open
+      xywh {481 95 340 296} when 0 hide resizable
+    } {
+      Fl_Box m_modelerView {
+        label ModelerView
+        xywh {0 0 340 295} resizable
+        code0 {\#include "modelerview.h"}
+        class ModelerView
+      }
+    }
+  }
+  Function {show()} {open
+  } {
+    code {m_controlsWindow->show();
+m_modelerWindow->show();
+m_modelerView->show();} {}
+  }
+} 
